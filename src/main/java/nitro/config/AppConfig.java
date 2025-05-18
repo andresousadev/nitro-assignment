@@ -10,8 +10,8 @@ public class AppConfig {
     private String getEnvVariable(String envVarName) {
         String value = System.getenv(envVarName);
 
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalStateException("Environment variable '" + envVarName + "' not found");
+        if(value == null) {
+            return "";
         }
 
         return value.trim();
@@ -25,7 +25,7 @@ public class AppConfig {
         return getEnvVariable("REDIS_URL");
     }
 
-    public int getCacheTtlSeconds() {
-        return Integer.parseInt(getEnvVariable("CACHE_TTL_SECONDS"));
+    public String getCacheTtlSeconds() {
+        return getEnvVariable("CACHE_TTL_SECONDS");
     }
 }

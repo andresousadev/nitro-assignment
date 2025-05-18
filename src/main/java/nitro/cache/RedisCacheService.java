@@ -4,20 +4,23 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class RedisCacheService implements ICacheService, AutoCloseable {
+    private static final int DEFAULT_TTL_SECONDS = 3600;
+
     private final Jedis jedis;
     private final int ttlSeconds;
 
-    public RedisCacheService(String redisUrl, int ttlSeconds) {
+    public RedisCacheService(String redisUrl, String ttlSeconds) {
         if (redisUrl == null || redisUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("Redis URL cannot be null or empty");
         }
 
-        if (ttlSeconds < 0) {
-            throw new IllegalArgumentException("TTL must be a positive integer");
+        if (ttlSeconds == null || ttlSeconds.isEmpty() || Integer.parseInt(ttlSeconds) < 0) {
+            this.ttlSeconds = DEFAULT_TTL_SECONDS;
+        } else {
+            this.ttlSeconds = Integer.parseInt(ttlSeconds);
         }
 
         this.jedis = new Jedis(redisUrl);
-        this.ttlSeconds = ttlSeconds;
     }
 
     @Override

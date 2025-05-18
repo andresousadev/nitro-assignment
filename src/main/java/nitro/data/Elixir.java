@@ -131,6 +131,7 @@ public class Elixir {
                 + "Time: " + (time != null ? time : "-") + "\n"
                 + "Difficulty: " + (difficulty != null ? difficulty : "-") + "\n"
                 + "Ingredients: [" + ingredientsString + "]\n"
-                + "Manufacturer: " + (manufacturer != null ? manufacturer : "-");
+                + "Manufacturer: " + (manufacturer != null ? manufacturer : "-") + "\n"
+                + "-----------------------------------------\n";
     }
 }

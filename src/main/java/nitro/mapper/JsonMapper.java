@@ -18,7 +18,7 @@ public class JsonMapper implements IJsonMapper {
     }
 
     @Override
-    public <T> T mapJsonObject(String json, Class<T> elementType) throws JsonProcessingException {
+    public <T> T mapJsonObject(String json, Class<T> elementType) throws RuntimeException {
         if (json == null || json.trim().isEmpty()) {
             return null;
         }
@@ -35,7 +35,7 @@ public class JsonMapper implements IJsonMapper {
     }
 
     @Override
-    public <T> List<T> mapJsonList(String json, Class<T> elementType) throws IllegalArgumentException {
+    public <T> List<T> mapJsonList(String json, Class<T> elementType) throws RuntimeException {
         if (json == null || json.trim().isEmpty()) {
             return Collections.emptyList();
         }

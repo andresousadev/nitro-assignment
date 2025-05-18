@@ -2,7 +2,6 @@ package nitro.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import java.util.List;
 import nitro.api.IWizardWorldApiClient;
 import nitro.cache.ICacheService;
@@ -18,9 +17,6 @@ public class ElixirService implements IElixirService {
     private final ICacheService cacheService;
     private final ObjectMapper objectMapper;
     private final IJsonMapper jsonMapper;
-
-    private final CollectionType elixirListType;
-    private final CollectionType ingredientListType;
 
     private boolean cacheEnabled = false;
 
@@ -49,9 +45,6 @@ public class ElixirService implements IElixirService {
         this.cacheService = cacheService;
         this.objectMapper = objectMapper;
         this.jsonMapper = jsonMapper;
-
-        this.elixirListType = objectMapper.getTypeFactory().constructCollectionType(List.class, Elixir.class);
-        this.ingredientListType = objectMapper.getTypeFactory().constructCollectionType(List.class, Ingredient.class);
     }
 
     @Override
@@ -93,7 +86,7 @@ public class ElixirService implements IElixirService {
             }
 
             return elixirs;
-            
+
         } catch (Exception e) {
             System.err.println("Error fetching elixirs from API: " + e.getMessage());
             throw new RuntimeException("Failed to fetch elixirs from API: " + e.getMessage());

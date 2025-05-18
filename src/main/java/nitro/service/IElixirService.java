@@ -5,6 +5,6 @@ import nitro.data.Elixir;
 import nitro.data.Ingredient;
 
 public interface IElixirService {
-    List<Elixir> getElixirs() throws Exception;
+    List<Elixir> getElixirs();
     List<Ingredient> getIngredients();
 }

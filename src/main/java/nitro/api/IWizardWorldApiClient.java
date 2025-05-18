@@ -17,6 +17,6 @@ public interface IWizardWorldApiClient {
     List<Ingredient> getAllIngredients();
 
     @GET
-    @Path("elixir")
+    @Path("elixirs")
     List<Elixir> getAllElixirs();
 }
