@@ -1,8 +1,22 @@
 package nitro.api;
 
-import java.io.IOException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import java.util.List;
+import nitro.data.Elixir;
+import nitro.data.Ingredient;
 
+@Path("/")
+@Produces(MediaType.APPLICATION_JSON)
 public interface IWizardWorldApiClient {
-    String getAllIngredients() throws Exception;
-    String getAllElixirs() throws Exception;
+
+    @GET
+    @Path("ingredients")
+    List<Ingredient> getAllIngredients();
+
+    @GET
+    @Path("elixir")
+    List<Elixir> getAllElixirs();
 }
