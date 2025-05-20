@@ -1,0 +1,26 @@
+services:
+  redis:
+    image: redis:6.2-alpine 
+    container_name: potion-crafter-redis
+    ports:
+      - "6379:6379" 
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  java-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: potion-crafter-app
+    depends_on:
+      - redis
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS}
+    stdin_open: true
+    tty: true
+
+volumes:
+  redis_data:
