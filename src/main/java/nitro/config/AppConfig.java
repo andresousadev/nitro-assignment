@@ -26,11 +26,19 @@ public class AppConfig {
     }
 
     /**
-     * Gets the redis url from the environment variables.
-     * @return The redis url.
+     * Gets the redis host from the environment variables.
+     * @return The redis host.
      */
-    public String getRedisUrl() {
-        return getEnvVariable("REDIS_URL");
+    public String getRedisHost() {
+        return getEnvVariable("REDIS_HOST");
+    }
+
+    /**
+     * Gets the redis port from the environment variables.
+     * @return The redis port.
+     */
+    public int getRedisPort() {
+        return Integer.parseInt(getEnvVariable("REDIS_PORT"));
     }
 
     /**

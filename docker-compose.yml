@@ -17,7 +17,8 @@ services:
       - redis
     environment:
       API_BASE_URL: ${API_BASE_URL}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
       CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS}
     stdin_open: true
     tty: true

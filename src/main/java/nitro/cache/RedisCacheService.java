@@ -17,9 +17,13 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
      * @param redisUrl The redis url.
      * @param ttlSeconds The TTL value.
      */
-    public RedisCacheService(String redisUrl, String ttlSeconds) {
-        if (redisUrl == null || redisUrl.trim().isEmpty()) {
+    public RedisCacheService(String redisHost, int redisPort, String ttlSeconds) {
+        if (redisHost == null || redisHost.trim().isEmpty()) {
             throw new IllegalArgumentException("Redis URL cannot be null or empty");
+        }
+
+        if(redisPort <= 0) {
+            throw new IllegalArgumentException("Redis port should be a positive number");
         }
 
         if (ttlSeconds == null || ttlSeconds.isEmpty() || Integer.parseInt(ttlSeconds) < 0) {
@@ -28,7 +32,7 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
             this.ttlSeconds = Integer.parseInt(ttlSeconds);
         }
 
-        this.jedis = new Jedis(redisUrl);
+        this.jedis = new Jedis(redisHost, redisPort);
     }
 
     /**
@@ -71,9 +75,8 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
 
         try {
             jedis.setex(key, ttlSeconds, value);
-            System.out.println("DEBUG: Cache set for key '" + key + "' with value '" + value + "' in ttl: " + ttlSeconds);
         } catch (JedisException e) {
-            System.err.println("Error setting key '" + key + "' with value '" + value + "': " + e.getMessage());
+            System.err.println("Error setting key '" + key + "': " + e.getMessage());
         }
     }
 

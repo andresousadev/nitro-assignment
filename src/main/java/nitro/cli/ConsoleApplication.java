@@ -42,9 +42,9 @@ public class ConsoleApplication {
 
             // Configure caching service.
             ICacheService cacheService;
-            if (appConfig.getRedisUrl() != null || !appConfig.getRedisUrl().isEmpty()) {
+            if (appConfig.getRedisHost() != null || !appConfig.getRedisHost().isEmpty() || appConfig.getRedisPort() > 0) {
                 try {
-                    cacheService = new RedisCacheService(appConfig.getRedisUrl(), appConfig.getCacheTtlSeconds());
+                    cacheService = new RedisCacheService(appConfig.getRedisHost(), appConfig.getRedisPort(), appConfig.getCacheTtlSeconds());
                     System.out.println("Redis cache initialized.");
                 } catch (Exception e) {
                     System.err.println("Redis cache initialization failed. Running without cache.");
