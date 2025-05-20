@@ -6,9 +6,16 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Defines the Json Mapper.
+ */
 public class JsonMapper implements IJsonMapper {
     private final ObjectMapper objectMapper;
 
+    /**
+     * Constructs the JsonMapper.
+     * @param objectMapper The object mapper.
+     */
     public JsonMapper(ObjectMapper objectMapper) {
         if (objectMapper == null) {
             throw new IllegalArgumentException("ObjectMapper must not be null");
@@ -17,6 +24,14 @@ public class JsonMapper implements IJsonMapper {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Maps Json to an object
+     * @param json
+     * @param elementType
+     * @return
+     * @param <T>
+     * @throws RuntimeException
+     */
     @Override
     public <T> T mapJsonObject(String json, Class<T> elementType) throws RuntimeException {
         if (json == null || json.trim().isEmpty()) {

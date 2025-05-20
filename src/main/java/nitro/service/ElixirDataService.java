@@ -9,6 +9,9 @@ import nitro.data.Elixir;
 import nitro.data.Ingredient;
 import nitro.mapper.IJsonMapper;
 
+/**
+ * Defines the ElixirDataService service.
+ */
 public class ElixirDataService implements IElixirDataService {
     private static final String CACHE_KEY_ELIXIRS = "elixirs:all";
     private static final String CACHE_KEY_INGREDIENTS = "ingredients:all";
@@ -22,6 +25,13 @@ public class ElixirDataService implements IElixirDataService {
 
     private boolean cacheEnabled = false;
 
+    /**
+     * Constructs the ElixirDataService.
+     * @param apiClient The WizardWorldApiClient client.
+     * @param cacheService The CacheService service.
+     * @param objectMapper The objectMapper to serialize objects into JSON.
+     * @param jsonMapper The jsonMapper to deserialize JSON into objects.
+     */
     public ElixirDataService(
             IWizardWorldApiClient apiClient,
             ICacheService cacheService,
@@ -50,6 +60,10 @@ public class ElixirDataService implements IElixirDataService {
         this.jsonMapper = jsonMapper;
     }
 
+    /**
+     * Gets all the Elixirs from the cache or from the API as fallback.
+     * @return The list of Elixirs.
+     */
     @Override
     public List<Elixir> getElixirs() {
         String cachedData = null;
@@ -75,6 +89,10 @@ public class ElixirDataService implements IElixirDataService {
         return elixirs;
     }
 
+    /**
+     * Gets the Elixirs from the API.
+     * @return The list of Elixirs.
+     */
     private List<Elixir> fetchElixirsFromApi() {
         try {
             List<Elixir> elixirs = apiClient.getAllElixirs();
@@ -96,6 +114,12 @@ public class ElixirDataService implements IElixirDataService {
         }
     }
 
+    /**
+     * Gets the Elixirs that require the specific Ingredient from cache or from the API
+     * as fallback.
+     * @param ingredientName The Ingredient name.
+     * @return The list of Elixirs that require that Ingredient.
+     */
     @Override
     public List<Elixir> getElixirsByIngredientName(String ingredientName) {
         if (ingredientName == null || ingredientName.trim().isEmpty()) {
@@ -126,6 +150,11 @@ public class ElixirDataService implements IElixirDataService {
         return elixirs;
     }
 
+    /**
+     * Gets the Elixirs that require the specific Ingredient  from the API
+     * @param ingredientName The Ingredient name.
+     * @return The list of Elixirs that require that Ingredient.
+     */
     private List<Elixir> fetchElixirsByIngredientNameFromApi(String ingredientName) {
         try {
             List<Elixir> elixirs = apiClient.getElixirsByIngredient(ingredientName);
@@ -146,6 +175,10 @@ public class ElixirDataService implements IElixirDataService {
         }
     }
 
+    /**
+     * Gets all the Ingredients from cache or from API as fallback.
+     * @return The list of the existing Ingredients.
+     */
     @Override
     public List<Ingredient> getIngredients() {
         String cachedData = null;
@@ -171,6 +204,10 @@ public class ElixirDataService implements IElixirDataService {
         return ingredients;
     }
 
+    /**
+     * Gets all the Ingredients from the API.
+     * @return The list of the existing Ingredients.
+     */
     private List<Ingredient> fetchIngredientsFromApi() {
         try {
             List<Ingredient> ingredients = apiClient.getAllIngredients();
@@ -192,6 +229,11 @@ public class ElixirDataService implements IElixirDataService {
         }
     }
 
+    /**
+     * Gets an Ingredient by name.
+     * @param name The name of the Ingredient.
+     * @return The Ingredient found.
+     */
     @Override
     public Ingredient getIngredientByName(String name) {
         if (name == null || name.trim().isEmpty()) {
@@ -222,12 +264,17 @@ public class ElixirDataService implements IElixirDataService {
         return ingredient;
     }
 
+    /**
+     * Gets an Ingredient by name from the API.
+     * @param name The Ingredient name.
+     * @return The Ingredient found.
+     */
     private Ingredient fetchIngredientFromApi(String name) {
         try {
             List<Ingredient> searchResult = apiClient.getIngredientByName(name);
 
-            if(searchResult.isEmpty()) {
-               return null;
+            if (searchResult.isEmpty()) {
+                return null;
             }
 
             Ingredient ingredient = searchResult.getFirst();
@@ -248,6 +295,11 @@ public class ElixirDataService implements IElixirDataService {
         }
     }
 
+    /**
+     * Validates the Ingredient by name.
+     * @param ingredient The Ingredient name.
+     * @return True if the Ingredient exists.
+     */
     @Override
     public boolean validateIngredientName(String ingredient) {
         if (ingredient.trim().isEmpty()) {

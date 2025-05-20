@@ -17,14 +17,26 @@ public class AppConfig {
         return value.trim();
     }
 
+    /**
+     * Gets the WizardWorld api url from the environment variables.
+     * @return The api url.
+     */
     public String getApiBaseUrl() {
         return getEnvVariable("API_BASE_URL");
     }
 
+    /**
+     * Gets the redis url from the environment variables.
+     * @return The redis url.
+     */
     public String getRedisUrl() {
         return getEnvVariable("REDIS_URL");
     }
 
+    /**
+     * Gets the default TTL value from the environment variables.
+     * @return The TTL value.
+     */
     public String getCacheTtlSeconds() {
         return getEnvVariable("CACHE_TTL_SECONDS");
     }

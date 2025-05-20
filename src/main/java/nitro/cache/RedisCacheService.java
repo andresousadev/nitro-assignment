@@ -3,12 +3,20 @@ package nitro.cache;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisException;
 
+/**
+ * Defines a Redis service.
+ */
 public class RedisCacheService implements ICacheService, AutoCloseable {
     private static final int DEFAULT_TTL_SECONDS = 3600;
 
     private final Jedis jedis;
     private final int ttlSeconds;
 
+    /**
+     * Constructs the RedisCacheService.
+     * @param redisUrl The redis url.
+     * @param ttlSeconds The TTL value.
+     */
     public RedisCacheService(String redisUrl, String ttlSeconds) {
         if (redisUrl == null || redisUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("Redis URL cannot be null or empty");
@@ -23,6 +31,11 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
         this.jedis = new Jedis(redisUrl);
     }
 
+    /**
+     * Retrieves a value from the cache based on its key.
+     * @param key The unique key to identify the cached data.
+     * @return The data string found.
+     */
     @Override
     public String get(String key) {
         if (key == null || key.trim().isEmpty()) {
@@ -45,6 +58,11 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
         }
     }
 
+    /**
+     * Stores a key-value pair in the cache with the defined TTL.
+     * @param key The unique key for the data.
+     * @param value The string data to cache.
+     */
     @Override
     public void set(String key, String value) {
         if (key == null || key.trim().isEmpty() || value == null || value.trim().isEmpty()) {
@@ -59,6 +77,9 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
         }
     }
 
+    /**
+     * Close the redis connection.
+     */
     @Override
     public void close() {
         if (jedis != null && jedis.isConnected()) {

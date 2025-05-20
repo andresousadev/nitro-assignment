@@ -21,11 +21,17 @@ import nitro.service.IElixirDataService;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+/**
+ * The type Console application.
+ */
 public class ConsoleApplication {
     private final Scanner scanner;
     private final IElixirDataService elixirService;
     private final IElixirCraftService elixirCraftService;
 
+    /**
+     * Configure all dependencies.
+     */
     public ConsoleApplication() {
         this.scanner = new Scanner(System.in);
 
@@ -34,6 +40,7 @@ public class ConsoleApplication {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonMapper jsonMapper = new JsonMapper(objectMapper);
 
+            // Configure caching service.
             ICacheService cacheService;
             if (appConfig.getRedisUrl() != null || !appConfig.getRedisUrl().isEmpty()) {
                 try {
@@ -46,8 +53,14 @@ public class ConsoleApplication {
             } else {
                 cacheService = null;
             }
+
+            // Create a new RESTEasy JAX-RS client.
             ResteasyClient client = (ResteasyClient) ClientBuilder.newClient();
+
+            // Defines the request web target.
             ResteasyWebTarget target = client.target(appConfig.getApiBaseUrl());
+
+            // Defines the proxy service which will be translated into the http requests.
             IWizardWorldApiClient apiClient = target.proxy(IWizardWorldApiClient.class);
 
             this.elixirService = new ElixirDataService(apiClient, cacheService, objectMapper, jsonMapper);
@@ -65,6 +78,9 @@ public class ConsoleApplication {
         }
     }
 
+    /**
+     * Starts the console program and prints the menu.
+     */
     public void run() {
         System.out.println("Welcome to the Wizard World Potion Crafter!");
 
@@ -103,6 +119,9 @@ public class ConsoleApplication {
         }
     }
 
+    /**
+     * Prints the console menu.
+     */
     private void printMenu() {
         System.out.println("\n--- Menu ---");
         System.out.println("1. List All Ingredients");
@@ -112,6 +131,9 @@ public class ConsoleApplication {
         System.out.print("Enter your choice: ");
     }
 
+    /**
+     * Lists all the existing ingredients.
+     */
     private void listAllIngredients() {
         System.out.println("\n--- All Ingredients ---");
         List<Ingredient> ingredients = elixirService.getIngredients();
@@ -123,6 +145,9 @@ public class ConsoleApplication {
         }
     }
 
+    /**
+     * List all the craftable elixirs.
+     */
     private void listAllElixirs() {
         System.out.println("\n--- All Elixirs ---");
         List<Elixir> elixirs = elixirService.getElixirs();
@@ -134,6 +159,9 @@ public class ConsoleApplication {
         }
     }
 
+    /**
+     * Lists all the craftable elixirs by a set of available ingredients.
+     */
     private void findCreatableElixirs() {
         Set<String> ingredientsAvailable = enterAvailableIngredients();
 
@@ -141,11 +169,21 @@ public class ConsoleApplication {
             return;
         }
 
-        System.out.println("\n--- Creatable Elixirs ---");
         Set<Elixir> craftableElixirs = elixirCraftService.findCraftableIngredients(ingredientsAvailable);
+
+        if (craftableElixirs.isEmpty()) {
+            System.out.println("\n--- No elixirs found. ---");
+            return;
+        }
+
+        System.out.println("\n--- Creatable Elixirs ---");
         craftableElixirs.forEach(System.out::println);
     }
 
+    /**
+     * Reads the user entered choice.
+     * @return The chosen option number.
+     */
     private int getUserChoice() {
         while (!scanner.hasNextInt()) {
             System.out.println("Invalid input. Please enter a number.");
@@ -157,6 +195,10 @@ public class ConsoleApplication {
         return choice;
     }
 
+    /**
+     * Reads the user available ingredients.
+     * @return A set of the user available ingredients.
+     */
     private Set<String> enterAvailableIngredients() {
         System.out.println("\n--- Enter Available Ingredients ---");
         System.out.println("Enter the ingredients you have, separated by commas.");
@@ -169,17 +211,18 @@ public class ConsoleApplication {
         if (inputLine != null && !inputLine.trim().isEmpty()) {
             String[] ingredients = inputLine.split(",");
             for (String ingredient : ingredients) {
-                if (!ingredient.trim().isEmpty()) {
-                    if (userIngredients.isEmpty() || !userIngredients.contains(ingredient)) {
-                        if (!elixirService.validateIngredientName(ingredient)) {
-                            System.err.println("Invalid ingredient name: " + ingredient);
+                String trimmedIngredient = ingredient.trim();
+                if (!trimmedIngredient.isEmpty()) {
+                    if (userIngredients.isEmpty() || !userIngredients.contains(trimmedIngredient)) {
+                        if (!elixirService.validateIngredientName(trimmedIngredient)) {
+                            System.err.println("Invalid ingredient name: " + trimmedIngredient);
                             return Collections.emptySet();
                         }
-                        userIngredients.add(ingredient);
-                    } else {
-                        System.err.println("Empty ingredient name found");
-                        return Collections.emptySet();
+                        userIngredients.add(trimmedIngredient);
                     }
+                } else {
+                    System.err.println("Empty ingredient name found");
+                    return Collections.emptySet();
                 }
             }
         } else {
