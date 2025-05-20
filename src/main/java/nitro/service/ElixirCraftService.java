@@ -1,8 +1,10 @@
 package nitro.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import nitro.data.Elixir;
+import nitro.data.Ingredient;
 
 public class ElixirCraftService implements IElixirCraftService {
     private final IElixirDataService elixirDataService;
@@ -26,20 +28,21 @@ public class ElixirCraftService implements IElixirCraftService {
         }
 
         for (Elixir elixir : potentialElixirs) {
-            for (String ingredient : ingredients) {
-                if (!elixirIngredientsContainIngredientName(elixir, ingredient)) {
-                    break;
-                }
-            }
+            if (elixir.getIngredients().size() > ingredients.size()) continue;
 
-            craftableElixirs.add(elixir);
+            if (userHasAllIngredientsForElixir(elixir.getIngredients(), ingredients)) craftableElixirs.add(elixir);
         }
 
         return craftableElixirs;
     }
 
-    private boolean elixirIngredientsContainIngredientName(Elixir elixir, String ingredientName) {
-        //TODO: Fix this method. User should have all the ingredients the Elixir requires.
-        return elixir.getIngredients().stream().anyMatch(ingredient -> ingredient.getName().equals(ingredientName));
+    private boolean userHasAllIngredientsForElixir(List<Ingredient> elixirIngredients, Set<String> ingredientNames) {
+        if (elixirIngredients.isEmpty()) return false;
+
+        for (Ingredient ingredient : elixirIngredients) {
+            if (!ingredientNames.contains(ingredient.getName())) return false;
+        }
+
+        return true;
     }
 }

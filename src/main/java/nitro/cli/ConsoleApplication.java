@@ -94,7 +94,7 @@ public class ConsoleApplication {
                         System.out.println("Exiting Potion Crafter. Goodbye!");
                         break;
                     default:
-                        System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                        System.out.println("Invalid choice. Please enter a number between 1 and 4.");
                 }
             } catch (Exception e) {
                 System.err.println("An unexpected error occurred during menu action: " + e.getMessage());

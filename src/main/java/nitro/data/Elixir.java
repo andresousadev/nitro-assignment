@@ -134,4 +134,18 @@ public class Elixir {
                 + "Manufacturer: " + (manufacturer != null ? manufacturer : "-") + "\n"
                 + "-----------------------------------------\n";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Elixir elixir = (Elixir) o;
+
+        return Objects.equals(id, elixir.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name.toLowerCase());
+    }
 }
