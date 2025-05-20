@@ -2,6 +2,7 @@ package nitro.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.client.ClientBuilder;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -13,21 +14,20 @@ import nitro.config.AppConfig;
 import nitro.data.Elixir;
 import nitro.data.Ingredient;
 import nitro.mapper.JsonMapper;
-import nitro.service.ElixirService;
-import nitro.service.IElixirService;
+import nitro.service.ElixirCraftService;
+import nitro.service.ElixirDataService;
+import nitro.service.IElixirCraftService;
+import nitro.service.IElixirDataService;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 public class ConsoleApplication {
     private final Scanner scanner;
-    private final IElixirService elixirService;
-    private final Set<String> ingredientNames;
-    private final Set<String> userIngredients;
+    private final IElixirDataService elixirService;
+    private final IElixirCraftService elixirCraftService;
 
     public ConsoleApplication() {
         this.scanner = new Scanner(System.in);
-        this.ingredientNames = new HashSet<>();
-        this.userIngredients = new HashSet<>();
 
         try {
             AppConfig appConfig = new AppConfig();
@@ -50,9 +50,8 @@ public class ConsoleApplication {
             ResteasyWebTarget target = client.target(appConfig.getApiBaseUrl());
             IWizardWorldApiClient apiClient = target.proxy(IWizardWorldApiClient.class);
 
-            this.elixirService = new ElixirService(apiClient, cacheService, objectMapper, jsonMapper);
-
-            preFetchAllIngredientNames();
+            this.elixirService = new ElixirDataService(apiClient, cacheService, objectMapper, jsonMapper);
+            this.elixirCraftService = new ElixirCraftService(elixirService);
 
         } catch (IllegalStateException e) {
             System.err.println("Application configuration error: " + e.getMessage());
@@ -104,8 +103,13 @@ public class ConsoleApplication {
         }
     }
 
-    private void findCreatableElixirs() {
-
+    private void printMenu() {
+        System.out.println("\n--- Menu ---");
+        System.out.println("1. List All Ingredients");
+        System.out.println("2. List All Elixirs");
+        System.out.println("3. Find Craftable Elixirs by Ingredients");
+        System.out.println("4. Exit");
+        System.out.print("Enter your choice: ");
     }
 
     private void listAllIngredients() {
@@ -130,13 +134,16 @@ public class ConsoleApplication {
         }
     }
 
-    private void printMenu() {
-        System.out.println("\n--- Menu ---");
-        System.out.println("1. List All Ingredients");
-        System.out.println("2. List All Elixirs");
-        System.out.println("3. Find Creatable Elixirs");
-        System.out.println("4. Exit");
-        System.out.print("Enter your choice: ");
+    private void findCreatableElixirs() {
+        Set<String> ingredientsAvailable = enterAvailableIngredients();
+
+        if (ingredientsAvailable.isEmpty()) {
+            return;
+        }
+
+        System.out.println("\n--- Creatable Elixirs ---");
+        Set<Elixir> craftableElixirs = elixirCraftService.findCraftableIngredients(ingredientsAvailable);
+        craftableElixirs.forEach(System.out::println);
     }
 
     private int getUserChoice() {
@@ -150,49 +157,36 @@ public class ConsoleApplication {
         return choice;
     }
 
-    private void enterAvailableIngredients() {
+    private Set<String> enterAvailableIngredients() {
         System.out.println("\n--- Enter Available Ingredients ---");
         System.out.println("Enter the ingredients you have, separated by commas.");
-        System.out.println("Valid ingredients based on API list: " + (ingredientNames.isEmpty() ? "Not loaded" : ingredientNames.size() + " ingredients"));
         System.out.print("Your ingredients: ");
 
+        Set<String> userIngredients = new HashSet<>();
+
         String inputLine = scanner.nextLine();
-        userIngredients.clear();
 
         if (inputLine != null && !inputLine.trim().isEmpty()) {
             String[] ingredients = inputLine.split(",");
-            int validCount = 0;
             for (String ingredient : ingredients) {
-                String trimmedLower = ingredient.trim().toLowerCase();
-                if (!trimmedLower.isEmpty()) {
-                    if (ingredientNames.isEmpty() || ingredientNames.contains(trimmedLower)) {
-                        userIngredients.add(trimmedLower);
-                        validCount++;
+                if (!ingredient.trim().isEmpty()) {
+                    if (userIngredients.isEmpty() || !userIngredients.contains(ingredient)) {
+                        if (!elixirService.validateIngredientName(ingredient)) {
+                            System.err.println("Invalid ingredient name: " + ingredient);
+                            return Collections.emptySet();
+                        }
+                        userIngredients.add(ingredient);
                     } else {
-                        System.out.println("Warning: '" + ingredient.trim() + "' is not a recognized ingredient and will be ignored.");
+                        System.err.println("Empty ingredient name found");
+                        return Collections.emptySet();
                     }
                 }
             }
-            System.out.println("You entered " + validCount + " recognized ingredient(s).");
         } else {
-            System.out.println("No ingredients entered.");
+            System.err.println("No ingredients entered.");
+            return Collections.emptySet();
         }
 
-        System.out.println("Current available ingredients: " + (userIngredients.isEmpty() ? "None" : String.join(", ", userIngredients)));
-    }
-
-    private void preFetchAllIngredientNames() {
-        List<Ingredient> allIngredients = this.elixirService.getIngredients();
-
-        if (allIngredients != null) {
-            allIngredients.stream()
-                    .map(Ingredient::getName)
-                    .filter(name -> name != null && !name.trim().isEmpty())
-                    .map(String::toLowerCase)
-                    .forEach(this.ingredientNames::add);
-        } else {
-            System.err.println("No ingredients found.");
-            throw new RuntimeException("There was am issue fetching the ingredients");
-        }
+        return userIngredients;
     }
 }
