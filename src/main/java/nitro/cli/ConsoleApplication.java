@@ -86,7 +86,7 @@ public class ConsoleApplication {
 
         boolean running = true;
         while (running) {
-            if (elixirService == null) {
+            if (elixirService == null || elixirCraftService == null) {
                 System.err.println("Core services are not initialized. Cannot run menu options. Exiting.");
                 running = false;
             }
@@ -172,7 +172,7 @@ public class ConsoleApplication {
         Set<Elixir> craftableElixirs = elixirCraftService.findCraftableIngredients(ingredientsAvailable);
 
         if (craftableElixirs.isEmpty()) {
-            System.out.println("\n--- No elixirs found. ---");
+            System.out.println("\n--- You  cannot craft any Elixir with those ingredients. ---");
             return;
         }
 

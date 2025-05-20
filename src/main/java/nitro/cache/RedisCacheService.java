@@ -14,7 +14,8 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
 
     /**
      * Constructs the RedisCacheService.
-     * @param redisUrl The redis url.
+     * @param redisHost The redis url.
+     * @param redisPort The redis port.
      * @param ttlSeconds The TTL value.
      */
     public RedisCacheService(String redisHost, int redisPort, String ttlSeconds) {
@@ -22,7 +23,7 @@ public class RedisCacheService implements ICacheService, AutoCloseable {
             throw new IllegalArgumentException("Redis URL cannot be null or empty");
         }
 
-        if(redisPort <= 0) {
+        if (redisPort <= 0) {
             throw new IllegalArgumentException("Redis port should be a positive number");
         }
 

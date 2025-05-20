@@ -25,15 +25,14 @@ public class JsonMapper implements IJsonMapper {
     }
 
     /**
-     * Maps Json to an object
-     * @param json
-     * @param elementType
-     * @return
-     * @param <T>
+     * Maps a JSON string to an object
+     * @param json The JSON string to be mapped.
+     * @param elementType The type of the element to be converted to.
+     * @return The mapped object.
      * @throws RuntimeException
      */
     @Override
-    public <T> T mapJsonObject(String json, Class<T> elementType) throws RuntimeException {
+    public <T> T mapJsonObject(String json, Class<T> elementType) {
         if (json == null || json.trim().isEmpty()) {
             return null;
         }
@@ -49,6 +48,13 @@ public class JsonMapper implements IJsonMapper {
         }
     }
 
+    /**
+     * Maps a JSON string to a list of objects.
+     * @param json The json string.
+     * @param elementType The element type to be serialized to.
+     * @return The mappes list of objects.
+     * @throws RuntimeException
+     */
     @Override
     public <T> List<T> mapJsonList(String json, Class<T> elementType) throws RuntimeException {
         if (json == null || json.trim().isEmpty()) {
